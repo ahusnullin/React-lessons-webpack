@@ -1,11 +1,42 @@
 import { FC, useEffect, useState } from 'react';
-import { Message } from './components/Message/Message';
-import { MessageInterface } from './common-types';
+import { MessageList } from './components/Message/MessageList';
+
 import style from './app.module.less';
 import { Form } from './components/Form/Form';
+import {
+  Container,
+  Grid,
+  Button, CssBaseline,
+} from "@mui/material";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import {iRoom} from "src/components/RoomsList/types";
+import {iMessage} from "src/components/Message/types";
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+import {nanoid} from "nanoid";
+import {RoomsList} from "src/components/RoomsList/RoomsList";
+
 
 export const App: FC = () => {
-  const [messagesList, setMessagesList] = useState<MessageInterface[]>([]);
+  const [messagesList, setMessagesList] = useState<iMessage[]>([]);
+  const [roomsList, setRoomsList] = useState<iRoom[]>([]);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
+
+  const defaultRoom: iRoom = {
+    id: '1',
+    name: 'Общий чат'
+  }
+
+  // инициализируем чат по умолчанию
+  useEffect(() => {
+    setRoomsList(
+        [
+            ...roomsList,
+            defaultRoom
+        ]
+    );
+  }, []);
 
   useEffect(() => {
     setMessagesList([
@@ -62,21 +93,61 @@ export const App: FC = () => {
     }
   }, [messagesList]);
 
-  const sendMessage = (messageObj: MessageInterface) => {
+  const sendMessage = (messageObj: iMessage) => {
     setMessagesList([...messagesList, messageObj]);
   };
 
-  return (
-    <div className={style.wrapper}>
-      <div className={style.content}>
-        <h1 data-testid="chat-header">Наш чат</h1>
+  const darkTheme = createTheme({
+    palette: {
+      mode: isDarkTheme ? 'dark' : 'light',
+    },
+  });
 
-        {messagesList.map((data, index) => (
-          <Message data={data} key={index} />
-        ))}
-        <Form sendMessage={sendMessage} />
-        <div style={{ clear: 'both' }}> </div>
-      </div>
-    </div>
+  return (
+      <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
+        <Container>
+          <h1 data-testid="chat-header">Наш чат</h1>
+          <Grid container spacing={2}>
+            <Grid item xs={3}>
+              <RoomsList roomsList={roomsList} />
+              <hr/>
+              <Button variant="contained" disableElevation onClick={() => setRoomsList(
+                  [
+                    ...roomsList,
+                    {
+                      id: nanoid(),
+                      name: 'Новый чат #' + roomsList.length,
+                    }
+                  ]
+              )}>
+                + Добавить новый чат
+              </Button>
+              <br/><br/>
+
+              <FormGroup>
+                <FormControlLabel control={<Switch onChange={() => setIsDarkTheme(!isDarkTheme)}/>} label="Тёмная тема" />
+              </FormGroup>
+            </Grid>
+            <Grid item xs={9}>
+              <Grid
+                  container
+                  direction="column"
+                  justifyContent="flex-start"
+                  alignItems="stretch"
+              >
+                <Grid>
+                  {messagesList.map((data, index) => (
+                      <MessageList data={data} key={index} />
+                  ))}
+                </Grid>
+                <Grid>
+                  <Form sendMessage={sendMessage} />
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Container>
+      </ThemeProvider>
   );
 };
