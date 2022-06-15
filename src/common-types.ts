@@ -3,7 +3,4 @@ export interface UserInterface {
   avatar: string;
 }
 
-export interface MessageInterface {
-  author: UserInterface;
-  text: string;
-}
+

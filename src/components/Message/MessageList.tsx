@@ -1,13 +1,13 @@
 import style from './message.module.less';
 import { FC } from 'react';
-import { MessageInterface } from 'src/common-types';
+import {iMessage} from "src/components/Message/types";
 
 interface MessageProps {
-  data: MessageInterface;
+  data: iMessage;
   key: number;
 }
 
-export const Message: FC<MessageProps> = ({ data }) => {
+export const MessageList: FC<MessageProps> = ({ data }) => {
   return (
     <div className={style.message} data-testid="message-item">
       <div className={style.avatar}>
