@@ -30,7 +30,7 @@ export const Form: FC<FormProps> = ({sendMessage}) => {
             text: message
         });
         if (textarea && textarea.current) {
-            textarea.current.value = '';
+            setMessage('');
             setFocus();
         }
     };
