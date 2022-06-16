@@ -1,153 +1,89 @@
-import { FC, useEffect, useState } from 'react';
-import { MessageList } from './components/Message/MessageList';
-
-import style from './app.module.less';
-import { Form } from './components/Form/Form';
+import {FC, useEffect, useState} from 'react';
 import {
-  Container,
-  Grid,
-  Button, CssBaseline,
-} from "@mui/material";
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import {iRoom} from "src/components/RoomsList/types";
-import {iMessage} from "src/components/Message/types";
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
-import {nanoid} from "nanoid";
-import {RoomsList} from "src/components/RoomsList/RoomsList";
+  BrowserRouter,
+  Route,
+  Routes,
+  useNavigate
+} from "react-router-dom";
+import {MainPage} from "src/pages/Main/MainPage";
+import {ProfilePage} from "src/pages/Profile/ProfilePage";
+import {ChatPage} from "src/pages/Chat/ChatPage";
+import {Layout} from "src/components/Layout/Layout";
+import {Error} from "src/pages/Error/Error";
+import {iRoom} from "src/components/Chat/RoomsList/types";
+import {iMessage, iMessagesList} from "src/components/Chat/Message/types";
 
+const defaultMessages: iMessagesList = {
+  "default": [
+    {
+      author: {
+        name: 'Вася',
+        avatar: 'https://picsum.photos/id/10/100',
+      },
+      text: 'Привет от Васи!',
+    }
+  ]
+}
 
 export const App: FC = () => {
-  const [messagesList, setMessagesList] = useState<iMessage[]>([]);
-  const [roomsList, setRoomsList] = useState<iRoom[]>([]);
-  const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const[chatList, setChatList] = useState<iRoom[]>([]);
+  const [messagesList, setMessagesList] = useState<iMessagesList>(defaultMessages);
 
   const defaultRoom: iRoom = {
-    id: '1',
-    name: 'Общий чат'
+    id: 'default',
+    name: 'Общий чат',
+    messages: [],
   }
 
   // инициализируем чат по умолчанию
   useEffect(() => {
-    setRoomsList(
+    setChatList(
         [
-            ...roomsList,
-            defaultRoom
+          ...chatList,
+          defaultRoom
         ]
     );
   }, []);
 
-  useEffect(() => {
-    setMessagesList([
-      {
-        author: {
-          name: 'Ваня',
-          avatar: 'https://picsum.photos/id/18/100',
-        },
-        text: 'Привет от Вани!',
-      },
-      {
-        author: {
-          name: 'Вася',
-          avatar: 'https://picsum.photos/id/10/100',
-        },
-        text: 'Привет от Васи!',
-      },
-      {
-        author: {
-          name: 'Петя',
-          avatar: 'https://picsum.photos/id/15/100',
-        },
-        text: 'Привет от Пети!',
-      },
-      {
-        author: {
-          name: 'Света',
-          avatar: 'https://picsum.photos/id/19/100',
-        },
-        text: 'Привет от Светы!',
-      },
-    ]);
-  }, []);
+  const addChat = (newChat: iRoom) => {
+    setChatList([...chatList, newChat]);
+  }
 
-  useEffect(() => {
-    if (
-      messagesList.length &&
-      messagesList.slice(-1)[0]?.author.name !== 'Bot'
-    ) {
-      setTimeout(() => {
-        setMessagesList([
-          ...messagesList,
-          {
-            author: {
-              name: 'Bot',
-              avatar: 'https://picsum.photos/id/10/100',
-            },
-            text: `Это автоматический ответ для: ${
-              messagesList.slice(-1)[0]?.author.name
-            }`,
-          },
-        ]);
-      }, 1500);
-    }
-  }, [messagesList]);
+  const addMessage = (chatId: string, newMessage: iMessage) => {
+    setMessagesList({
+      ...messagesList,
+      [chatId]: [...messagesList[chatId] || [], newMessage]
+    });
+  }
 
-  const sendMessage = (messageObj: iMessage) => {
-    setMessagesList([...messagesList, messageObj]);
-  };
+  const deleteChat = (chatId: string) => {
 
-  const darkTheme = createTheme({
-    palette: {
-      mode: isDarkTheme ? 'dark' : 'light',
-    },
-  });
+    setChatList(chatList.filter((room) => {
+      return room.id !== chatId
+    }));
+
+    setMessagesList({
+      ...messagesList,
+      [chatId]: []
+    });
+
+    // todo: я хотел сделать редирект на главную страницу (default), но не нашёл решения.
+    //  Использовать хуки не получается, т.к. роутер должен быть в родительском компоненте. Какие есть варианты решения?
+  }
 
   return (
-      <ThemeProvider theme={darkTheme}>
-        <CssBaseline />
-        <Container>
-          <h1 data-testid="chat-header">Наш чат</h1>
-          <Grid container spacing={2}>
-            <Grid item xs={3}>
-              <RoomsList roomsList={roomsList} />
-              <hr/>
-              <Button variant="contained" disableElevation onClick={() => setRoomsList(
-                  [
-                    ...roomsList,
-                    {
-                      id: nanoid(),
-                      name: 'Новый чат #' + roomsList.length,
-                    }
-                  ]
-              )}>
-                + Добавить новый чат
-              </Button>
-              <br/><br/>
-
-              <FormGroup>
-                <FormControlLabel control={<Switch onChange={() => setIsDarkTheme(!isDarkTheme)}/>} label="Тёмная тема" />
-              </FormGroup>
-            </Grid>
-            <Grid item xs={9}>
-              <Grid
-                  container
-                  direction="column"
-                  justifyContent="flex-start"
-                  alignItems="stretch"
-              >
-                <Grid>
-                  {messagesList.map((data, index) => (
-                      <MessageList data={data} key={index} />
-                  ))}
-                </Grid>
-                <Grid>
-                  <Form sendMessage={sendMessage} />
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Container>
-      </ThemeProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout/>}>
+            <Route path="/" element={<MainPage/>}/>
+            <Route path="chats">
+              <Route index element={<ChatPage roomsList={chatList} addRoom={addChat} messagesList={messagesList} addMessage={addMessage} deleteChat={deleteChat}/>} />
+              <Route path=":chatId"  element={<ChatPage roomsList={chatList} addRoom={addChat} messagesList={messagesList} addMessage={addMessage} deleteChat={deleteChat} />} />
+            </Route>
+            <Route path="profile" element={<ProfilePage/>}/>
+            <Route path="*" element={<Error text="Страница не найдена" />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
   );
 };
