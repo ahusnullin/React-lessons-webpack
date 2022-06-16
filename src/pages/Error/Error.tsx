@@ -1,11 +1,10 @@
-import {FC} from "react";
-import {Alert} from "@mui/material";
+import { FC } from 'react';
+import { Alert } from '@mui/material';
 
 interface iErrorProps {
-    text: string
+  text: string;
 }
 
-export const Error: FC<iErrorProps> = ({text}) => {
-
-    return <Alert severity="error">{text}</Alert>
-}
+export const Error: FC<iErrorProps> = ({ text }) => {
+  return <Alert severity="error">{text}</Alert>;
+};
