@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1655155016130" clover="3.2.0">
-  <project timestamp="1655155016130" name="All files">
+<coverage generated="1655156131838" clover="3.2.0">
+  <project timestamp="1655156131838" name="All files">
     <metrics statements="11" coveredstatements="10" conditionals="4" coveredconditionals="3" methods="3" coveredmethods="2" elements="18" coveredelements="15" complexity="0" loc="11" ncloc="11" packages="1" files="2" classes="2"/>
     <file name="Form.tsx" path="D:\ReactLessons\react-lessons-local\src\components\Form\Form.tsx">
       <metrics statements="10" coveredstatements="9" conditionals="4" coveredconditionals="3" methods="3" coveredmethods="2"/>
