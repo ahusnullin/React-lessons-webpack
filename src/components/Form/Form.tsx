@@ -10,21 +10,19 @@ import {
   DialogTitle,
 } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
+import {useSelector} from "react-redux";
+import {iProfileState} from "store/profile/reduser";
 
 interface FormProps {
   chatId: string;
   addMessage: (chatId: string, msg: iMessage) => void;
 }
 
-const Me: UserInterface = {
-  name: 'User',
-  avatar: 'https://picsum.photos/id/18/100',
-};
-
 export const Form: FC<FormProps> = ({ chatId, addMessage }) => {
   const [message, setMessage] = useState('');
   const textarea = useRef<HTMLTextAreaElement>(null);
   const [open, setOpen] = useState(false);
+  const userName = useSelector((state: iProfileState) => state.name);
 
   const setFocus = () => {
     if (textarea && textarea.current) {
@@ -39,7 +37,10 @@ export const Form: FC<FormProps> = ({ chatId, addMessage }) => {
       setOpen(true);
     } else {
       addMessage(chatId, {
-        author: Me,
+        author: {
+          name: userName,
+          avatar: 'https://picsum.photos/id/18/100',
+        },
         text: message,
       });
 

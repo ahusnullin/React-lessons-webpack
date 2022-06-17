@@ -7,6 +7,8 @@ import { Layout } from 'src/components/Layout/Layout';
 import { Error } from 'src/pages/Error/Error';
 import { iRoom } from 'src/components/Chat/RoomsList/types';
 import { iMessage, iMessagesList } from 'src/components/Chat/Message/types';
+import {Provider} from "react-redux";
+import {store} from "src/store";
 
 const defaultMessages: iMessagesList = {
   default: [
@@ -64,40 +66,42 @@ export const App: FC = () => {
   };
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route path="/" element={<MainPage />} />
-          <Route path="chats">
-            <Route
-              index
-              element={
-                <ChatPage
-                  roomsList={chatList}
-                  addRoom={addChat}
-                  messagesList={messagesList}
-                  addMessage={addMessage}
-                  deleteChat={deleteChat}
+      <Provider store={store}>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout/>}>
+              <Route path="/" element={<MainPage/>}/>
+              <Route path="chats">
+                <Route
+                    index
+                    element={
+                      <ChatPage
+                          roomsList={chatList}
+                          addRoom={addChat}
+                          messagesList={messagesList}
+                          addMessage={addMessage}
+                          deleteChat={deleteChat}
+                      />
+                    }
                 />
-              }
-            />
-            <Route
-              path=":chatId"
-              element={
-                <ChatPage
-                  roomsList={chatList}
-                  addRoom={addChat}
-                  messagesList={messagesList}
-                  addMessage={addMessage}
-                  deleteChat={deleteChat}
+                <Route
+                    path=":chatId"
+                    element={
+                      <ChatPage
+                          roomsList={chatList}
+                          addRoom={addChat}
+                          messagesList={messagesList}
+                          addMessage={addMessage}
+                          deleteChat={deleteChat}
+                      />
+                    }
                 />
-              }
-            />
-          </Route>
-          <Route path="profile" element={<ProfilePage />} />
-          <Route path="*" element={<Error text="Страница не найдена" />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+              </Route>
+              <Route path="profile" element={<ProfilePage/>}/>
+              <Route path="*" element={<Error text="Страница не найдена"/>}/>
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </Provider>
   );
 };
